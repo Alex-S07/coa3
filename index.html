@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COA Module 3 – The Memory System | Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f1a;
+    --surface: #13172b;
+    --card: #1a1f38;
+    --border: #252b4a;
+    --accent1: #5b8af5;
+    --accent2: #f0a500;
+    --accent3: #3de8a0;
+    --accent4: #f05c6e;
+    --accent5: #b06ef5;
+    --text: #e2e6f3;
+    --muted: #7a82a6;
+    --highlight-bg: #1e2540;
+    --tag-bg: #222847;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  /* ─── LAYOUT ─── */
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    width: 270px; height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 24px 0;
+    z-index: 100;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .sidebar-logo {
+    padding: 0 24px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .sidebar-logo .course { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent1); letter-spacing: 2px; text-transform: uppercase; }
+  .sidebar-logo h2 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; margin-top: 4px; }
+
+  .nav-section { padding: 0 12px; margin-bottom: 8px; }
+  .nav-section-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 12px; margin-bottom: 4px; }
+  .nav-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 8px;
+    color: var(--muted); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+    border: none; background: none; width: 100%; text-align: left;
+  }
+  .nav-link:hover, .nav-link.active { background: var(--highlight-bg); color: var(--text); }
+  .nav-link .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .main { margin-left: 270px; padding: 48px 56px; max-width: 1100px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 48px 0 56px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .hero .badge { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent1); letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--accent1); padding: 4px 12px; border-radius: 20px; margin-bottom: 20px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; line-height: 1.1; color: #fff; }
+  .hero h1 span { color: var(--accent2); }
+  .hero p { margin-top: 16px; color: var(--muted); max-width: 600px; font-size: 15px; }
+  .topics-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .pill { background: var(--tag-bg); border: 1px solid var(--border); color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 14px; border-radius: 20px; }
+
+  /* ─── SECTIONS ─── */
+  .section { margin-bottom: 72px; scroll-margin-top: 24px; }
+  .section-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px;
+  }
+  .section-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .section-header h2 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: #fff; }
+  .section-header .subtitle { font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+  /* ─── CARDS ─── */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 32px; margin-bottom: 20px; }
+  .card h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .card h3 .tag { font-size: 10px; font-family: 'IBM Plex Mono', monospace; padding: 2px 8px; border-radius: 6px; font-weight: 500; letter-spacing: 1px; }
+  .card p, .card li { color: var(--muted); font-size: 15px; }
+  .card ul { padding-left: 20px; }
+  .card ul li { margin-bottom: 6px; }
+
+  /* ─── HIGHLIGHT BOXES ─── */
+  .highlight {
+    border-left: 3px solid;
+    padding: 16px 20px;
+    border-radius: 0 10px 10px 0;
+    margin: 16px 0;
+    font-size: 15px;
+  }
+  .highlight.blue { border-color: var(--accent1); background: rgba(91,138,245,0.07); }
+  .highlight.yellow { border-color: var(--accent2); background: rgba(240,165,0,0.07); }
+  .highlight.green { border-color: var(--accent3); background: rgba(61,232,160,0.07); }
+  .highlight.red { border-color: var(--accent4); background: rgba(240,92,110,0.07); }
+  .highlight.purple { border-color: var(--accent5); background: rgba(176,110,245,0.07); }
+  .highlight strong { color: var(--text); }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+  .compare-table th { background: var(--highlight-bg); color: var(--accent1); font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 12px 16px; text-align: left; border-bottom: 2px solid var(--border); }
+  .compare-table td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .compare-table .label { color: var(--text); font-weight: 500; font-family: 'Syne', sans-serif; }
+
+  /* ─── FORMULA BOX ─── */
+  .formula {
+    background: #0a0c1a;
+    border: 1px solid var(--accent1);
+    border-radius: 10px;
+    padding: 18px 24px;
+    margin: 16px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--accent3);
+  }
+  .formula .label { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .formula .eq { color: #fff; font-size: 16px; }
+
+  /* ─── MEMORY BITS (flashcard style) ─── */
+  .memory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+  .memory-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+  .memory-card:hover { transform: translateY(-2px); }
+  .memory-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .memory-card.blue::before { background: var(--accent1); border-color: var(--accent1); }
+  .memory-card.yellow::before { background: var(--accent2); }
+  .memory-card.green::before { background: var(--accent3); }
+  .memory-card.red::before { background: var(--accent4); }
+  .memory-card.purple::before { background: var(--accent5); }
+  .memory-card.blue:hover { border-color: var(--accent1); }
+  .memory-card.yellow:hover { border-color: var(--accent2); }
+  .memory-card.green:hover { border-color: var(--accent3); }
+  .memory-card.red:hover { border-color: var(--accent4); }
+  .memory-card.purple:hover { border-color: var(--accent5); }
+  .memory-card .term { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .memory-card .def { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .memory-card .emoji { font-size: 22px; margin-bottom: 10px; display: block; }
+
+  /* ─── STEP LIST ─── */
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { counter-increment: step; display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start; }
+  .steps li::before {
+    content: counter(step);
+    background: var(--accent1);
+    color: #fff;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .steps li span { color: var(--muted); font-size: 15px; }
+  .steps li strong { color: var(--text); }
+
+  /* ─── QUIZ SECTION ─── */
+  .quiz-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .quiz-card .question { font-family: 'Syne', sans-serif; font-size: 16px; color: #fff; margin-bottom: 16px; }
+  .quiz-option {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 14px; border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer; margin-bottom: 8px;
+    transition: all 0.15s; font-size: 14px; color: var(--muted);
+    background: var(--bg);
+  }
+  .quiz-option:hover { border-color: var(--accent1); color: var(--text); }
+  .quiz-option .opt-label { font-family: 'IBM Plex Mono', monospace; color: var(--accent1); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .quiz-option.correct { border-color: var(--accent3); background: rgba(61,232,160,0.06); color: var(--text); }
+  .quiz-option.wrong { border-color: var(--accent4); background: rgba(240,92,110,0.06); }
+  .quiz-btn { display: none; }
+  .quiz-explanation { display: none; margin-top: 12px; padding: 12px 16px; background: var(--highlight-bg); border-radius: 8px; font-size: 14px; color: var(--muted); border-left: 3px solid var(--accent3); }
+  .show-answer-btn {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    padding: 8px 18px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 13px;
+    margin-top: 8px; transition: all 0.15s;
+  }
+  .show-answer-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+
+  /* ─── MAPPING VISUAL ─── */
+  .mapping-visual {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+  }
+  .mapping-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .bit-group { display: flex; }
+  .bit { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); font-size: 11px; }
+  .bit.tag { background: rgba(240,165,0,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .bit.block { background: rgba(91,138,245,0.15); border-color: var(--accent1); color: var(--accent1); }
+  .bit.word { background: rgba(61,232,160,0.15); border-color: var(--accent3); color: var(--accent3); }
+  .bit.set { background: rgba(176,110,245,0.15); border-color: var(--accent5); color: var(--accent5); }
+  .bit-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* ─── HIERARCHY VIZ ─── */
+  .hierarchy { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 24px 0; }
+  .hier-level {
+    display: flex; align-items: center; justify-content: space-between;
+    border-radius: 10px; padding: 14px 24px;
+    width: 100%; max-width: 500px;
+    margin-bottom: 4px;
+    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--border);
+  }
+  .hier-level .left { display: flex; flex-direction: column; }
+  .hier-level .name { color: #fff; }
+  .hier-level .type { font-size: 11px; color: var(--muted); font-weight: 400; font-family: 'IBM Plex Mono', monospace; }
+  .hier-level .right { text-align: right; }
+  .hier-level .speed { font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+  .hier-level .size { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .hier-arrow { font-size: 12px; color: var(--muted); margin: 2px 0; }
+  .hier-level.regs { background: rgba(240,92,110,0.08); border-color: var(--accent4); }
+  .hier-level.regs .speed { color: var(--accent4); }
+  .hier-level.l1 { background: rgba(240,165,0,0.08); border-color: var(--accent2); max-width: 460px; }
+  .hier-level.l1 .speed { color: var(--accent2); }
+  .hier-level.l2 { background: rgba(91,138,245,0.08); border-color: var(--accent1); max-width: 420px; }
+  .hier-level.l2 .speed { color: var(--accent1); }
+  .hier-level.main { background: rgba(61,232,160,0.08); border-color: var(--accent3); max-width: 380px; }
+  .hier-level.main .speed { color: var(--accent3); }
+  .hier-level.disk { background: rgba(176,110,245,0.08); border-color: var(--accent5); max-width: 340px; }
+  .hier-level.disk .speed { color: var(--accent5); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 24px 20px; }
+  }
+
+  .accent-blue { color: var(--accent1); }
+  .accent-yellow { color: var(--accent2); }
+  .accent-green { color: var(--accent3); }
+  .accent-red { color: var(--accent4); }
+  .accent-purple { color: var(--accent5); }
+  b, strong { color: var(--text); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+  /* progress bar */
+  .progress-bar { position: fixed; top: 0; left: 270px; right: 0; height: 2px; background: var(--border); z-index: 200; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent1), var(--accent3)); width: 0%; transition: width 0.1s; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">24SJPBCST404</div>
+    <h2>Module 3 — The Memory System</h2>
+  </div>
+  <div class="nav-section-label">Contents</div>
+  <div class="nav-section">
+    <a class="nav-link" href="#basics" onclick="setActive(this)"><span class="dot" style="background:var(--accent1)"></span>Basic Concepts</a>
+    <a class="nav-link" href="#ram-types" onclick="setActive(this)"><span class="dot" style="background:var(--accent2)"></span>RAM Types</a>
+    <a class="nav-link" href="#sram-dram" onclick="setActive(this)"><span class="dot" style="background:var(--accent3)"></span>SRAM vs DRAM</a>
+    <a class="nav-link" href="#dram-types" onclick="setActive(this)"><span class="dot" style="background:var(--accent4)"></span>DRAM Variants</a>
+    <a class="nav-link" href="#rom-types" onclick="setActive(this)"><span class="dot" style="background:var(--accent5)"></span>ROM Family</a>
+    <a class="nav-link" href="#hierarchy" onclick="setActive(this)"><span class="dot" style="background:var(--accent1)"></span>Memory Hierarchy</a>
+    <a class="nav-link" href="#cache" onclick="setActive(this)"><span class="dot" style="background:var(--accent2)"></span>Cache Memory</a>
+    <a class="nav-link" href="#mapping" onclick="setActive(this)"><span class="dot" style="background:var(--accent3)"></span>Mapping Functions</a>
+    <a class="nav-link" href="#replacement" onclick="setActive(this)"><span class="dot" style="background:var(--accent4)"></span>Replacement Algorithms</a>
+    <a class="nav-link" href="#performance" onclick="setActive(this)"><span class="dot" style="background:var(--accent5)"></span>Performance & Interleaving</a>
+    <a class="nav-link" href="#controller" onclick="setActive(this)"><span class="dot" style="background:var(--accent1)"></span>Memory Controller</a>
+    <a class="nav-link" href="#flashcards" onclick="setActive(this)"><span class="dot" style="background:var(--accent2)"></span>⚡ Key Terms</a>
+    <a class="nav-link" href="#quiz" onclick="setActive(this)"><span class="dot" style="background:var(--accent3)"></span>🧠 Quick Quiz</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">COA — Module 3</div>
+    <h1>The <span>Memory</span> System</h1>
+    <p>A complete exam-ready guide: every concept explained simply, with definitions, comparisons, formulas, and quick recall tips.</p>
+    <div class="topics-pills">
+      <span class="pill">Basic Concepts</span>
+      <span class="pill">SRAM / DRAM</span>
+      <span class="pill">ROM Types</span>
+      <span class="pill">Cache Memory</span>
+      <span class="pill">Mapping Functions</span>
+      <span class="pill">Replacement Algorithms</span>
+      <span class="pill">Memory Hierarchy</span>
+      <span class="pill">Interleaving</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 1. BASIC CONCEPTS -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="basics">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(91,138,245,0.15)">📐</div>
+      <div><h2>Basic Concepts</h2><div class="subtitle">Addressing · MAR & MDR · Access Time · Cycle Time</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Memory Size & Addressing</h3>
+      <p>The maximum memory size is set by the <strong>number of address bits</strong> the CPU can generate.</p>
+      <div class="formula">
+        <span class="label">Rule</span>
+        <span class="eq">k address bits → 2<sup>k</sup> addressable locations</span>
+      </div>
+      <div class="highlight blue">
+        <strong>Example:</strong> A 16-bit computer generates 16-bit addresses → can address up to 2<sup>16</sup> = <strong>64K locations</strong>. A 32-bit address space → 2<sup>32</sup> = 4G locations.
+      </div>
+      <p style="margin-top:12px;"><strong>Byte-Addressable:</strong> Most modern computers address individual bytes. Endianness determines byte ordering — <em>little-endian</em> (Intel), <em>big-endian</em> (68000), <em>bi-endian</em> (ARM).</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>MAR — Memory Address Register</h3>
+        <p>Holds the <strong>address</strong> of the memory location to be read from or written to.</p>
+        <div class="highlight blue" style="margin-top:12px;">If MAR is <strong>k bits</strong> wide → memory can have up to <strong>2<sup>k</sup> locations</strong></div>
+      </div>
+      <div class="card">
+        <h3>MDR — Memory Data Register</h3>
+        <p>Holds the <strong>data</strong> being transferred to or from memory.</p>
+        <div class="highlight yellow" style="margin-top:12px;">If MDR is <strong>n bits</strong> wide → <strong>n bits</strong> are transferred per memory cycle (= word length)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Memory Read & Write Operations</h3>
+      <div class="two-col">
+        <div>
+          <p style="margin-bottom:10px;"><span class="accent-green">🟢 READ Operation:</span></p>
+          <ol class="steps">
+            <li><span>Load address of required location into <strong>MAR</strong></span></li>
+            <li><span>Set <strong>R/W line to 1</strong> (Read)</span></li>
+            <li><span>Memory places data on data lines</span></li>
+            <li><span>Memory asserts <strong>MFC (Memory Function Completed)</strong> signal</span></li>
+            <li><span>Processor loads data from data lines into <strong>MDR</strong></span></li>
+          </ol>
+        </div>
+        <div>
+          <p style="margin-bottom:10px;"><span class="accent-red">🔴 WRITE Operation:</span></p>
+          <ol class="steps">
+            <li><span>Load address into <strong>MAR</strong></span></li>
+            <li><span>Load data into <strong>MDR</strong></span></li>
+            <li><span>Set <strong>R/W line to 0</strong> (Write)</span></li>
+            <li><span>Wait for <strong>MFC</strong> signal</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Memory Access Time ⏱</h3>
+        <p>Time elapsed between <strong>initiation</strong> and <strong>completion</strong> of a memory operation.</p>
+        <div class="highlight blue" style="margin-top:10px;">Example: time between sending a READ command and receiving MFC signal</div>
+      </div>
+      <div class="card">
+        <h3>Memory Cycle Time 🔄</h3>
+        <p><strong>Minimum delay</strong> between initiations of two successive memory operations.</p>
+        <div class="highlight yellow" style="margin-top:10px;"><strong>Cycle Time > Access Time</strong> (always slightly longer)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>RAM — Random Access Memory</h3>
+      <p>A memory unit where <strong>any location</strong> can be read or written in a <strong>fixed amount of time, regardless of address</strong>. This distinguishes it from serial access devices like magnetic tapes and disks (which depend on physical position).</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 2. RAM TYPES OVERVIEW -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="ram-types">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(240,165,0,0.15)">💾</div>
+      <div><h2>RAM Types Overview</h2><div class="subtitle">Memory Organization · Chip Structure</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Memory Chip Organization — 16×8 Example</h3>
+      <p>A 16×8 chip stores <strong>16 words × 8 bits = 128 bits</strong>. Cells are arranged in an array.</p>
+      <ul style="margin-top:12px;">
+        <li>Each <strong>row = one memory word</strong>; all row cells share a <strong>word line</strong></li>
+        <li><strong>Word line</strong> is connected to the address decoder</li>
+        <li>Each column has a <strong>Sense/Write circuit</strong> connected to a bidirectional data line</li>
+        <li><strong>R/W line</strong> specifies the operation; <strong>CS (Chip Select)</strong> selects the chip</li>
+        <li>16×8 chip → 16 pins: 4 address + 8 data + 2 control + 2 power</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>1K × 1 Memory Organization</h3>
+      <p>1K cells = 1024 bits. Can be organized as <strong>128×8</strong> (19 pins) or <strong>1K×1</strong> (15 pins).</p>
+      <div class="highlight blue" style="margin-top:12px;">In 1K×1: 10-bit address split into two 5-bit groups → row address (selects 32 cells) + column address (picks 1 of the 32). Reduces pin count.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 3. SRAM vs DRAM -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="sram-dram">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(61,232,160,0.15)">⚡</div>
+      <div><h2>SRAM vs DRAM</h2><div class="subtitle">Static vs Dynamic RAM — the most important comparison</div></div>
+    </div>
+
+    <div class="card">
+      <table class="compare-table">
+        <thead>
+          <tr><th>Feature</th><th>SRAM (Static)</th><th>DRAM (Dynamic)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">Storage mechanism</td><td>Flip-flops (on/off transistor switches)</td><td>Charge on capacitor</td></tr>
+          <tr><td class="label">Data retention</td><td>Retains as long as power is on — no refresh needed</td><td>Capacitor leaks — must be refreshed every ~64 ms</td></tr>
+          <tr><td class="label">Speed</td><td><span class="accent-green">Faster</span> (nanoseconds)</td><td><span class="accent-red">Slower</span></td></tr>
+          <tr><td class="label">Cell complexity</td><td>Complex (6 transistors)</td><td>Simple (1 transistor + 1 capacitor)</td></tr>
+          <tr><td class="label">Cost</td><td><span class="accent-red">More expensive</span></td><td><span class="accent-green">Cheaper</span></td></tr>
+          <tr><td class="label">Density</td><td>Lower — can't pack many cells per chip</td><td>Higher — simpler cell = more cells per chip</td></tr>
+          <tr><td class="label">Refresh circuit</td><td>Not needed</td><td>Required</td></tr>
+          <tr><td class="label">Primary use</td><td><strong>Cache memory</strong></td><td><strong>Main memory</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>SRAM Cell — How it works</h3>
+        <p>Built from <strong>two cross-connected transistor inverters</strong> forming a flip-flop. Connected to word line (W) and two bit lines (b, b') by transistors T1 and T2.</p>
+        <div class="highlight green" style="margin-top:12px;">
+          <strong>Read:</strong> Activate word line → T1 & T2 close → sense b and b' → state 1: b=high, b'=low
+        </div>
+        <div class="highlight blue" style="margin-top:8px;">
+          <strong>Write:</strong> Set b and b' to desired values → activate word line → forces cell into that state
+        </div>
+        <p style="margin-top:10px;">When word line = ground, transistors OFF → latch retains state indefinitely.</p>
+      </div>
+      <div class="card">
+        <h3>DRAM Cell — How it works</h3>
+        <p>A single transistor + capacitor. The capacitor stores charge = bit value. Charge leaks over time → must be refreshed.</p>
+        <div class="highlight yellow" style="margin-top:12px;">
+          <strong>Write:</strong> Drive bit line → select row → capacitor charges/discharges
+        </div>
+        <div class="highlight red" style="margin-top:8px;">
+          <strong>Read:</strong> Precharge bit line → select row → cell shares charge → sense tiny voltage change → write value back (destructive read!)
+        </div>
+        <div class="highlight green" style="margin-top:8px;">
+          <strong>Refresh:</strong> Just do a "dummy read" on every row periodically
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 4. DRAM VARIANTS -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="dram-types">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(240,92,110,0.15)">🔁</div>
+      <div><h2>DRAM Variants</h2><div class="subtitle">Async → Sync → Fast Page Mode → DDR</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Asynchronous DRAM</h3>
+      <p>The original DRAM type. Addresses are sent in <strong>two parts</strong> using multiplexed address pins to reduce pin count:</p>
+      <ul style="margin-top:10px;">
+        <li><strong>RAS (Row Address Strobe)</strong> — latches the row address (high-order bits)</li>
+        <li><strong>CAS (Column Address Strobe)</strong> — latches the column address (low-order bits)</li>
+      </ul>
+      <div class="highlight yellow" style="margin-top:12px;">Timing is NOT synchronized with processor clock — controller generates RAS/CAS independently.</div>
+    </div>
+
+    <div class="card">
+      <h3>Fast Page Mode (FPM)</h3>
+      <p>When the DRAM row is selected, <strong>all cells in that row are sensed</strong> and latched. To access consecutive bytes in the same row:</p>
+      <div class="highlight green" style="margin-top:10px;">No need to re-select the row! Apply different <strong>column addresses</strong> using CAS repeatedly → much faster for sequential/block access. This is called <strong>"fast page mode"</strong>.</div>
+    </div>
+
+    <div class="card">
+      <h3>Synchronous DRAM (SDRAM)</h3>
+      <p>Operation is directly <strong>synchronized with the processor clock</strong>. Uses address/data registers (latches) at inputs/outputs. Key features:</p>
+      <ul style="margin-top:10px;">
+        <li><strong>Burst mode</strong>: Column counter auto-increments → data placed on lines every clock cycle</li>
+        <li>No need for external CAS pulses for successive columns</li>
+        <li>All actions triggered on <strong>rising edge</strong> of clock</li>
+        <li><strong>Mode register</strong> configures burst length and operation</li>
+        <li>Built-in <strong>refresh circuitry</strong> (each row refreshed every 64 ns)</li>
+      </ul>
+      <div class="formula" style="margin-top:14px;">
+        <span class="label">Latency (example)</span>
+        <span class="eq">RAS assertion → first data word = 5 clock cycles → Latency = 5</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>DDR SDRAM — Double Data Rate</h3>
+      <p>Same cell array as SDRAM, but transfers data on <strong>both rising and falling edges</strong> of the clock.</p>
+      <div class="highlight green" style="margin-top:10px;"><strong>Result:</strong> Same latency, but bandwidth is effectively <strong>doubled</strong> for long burst transfers.</div>
+      <p style="margin-top:10px;">Cell array organized in <strong>2 or 4 banks</strong>. Consecutive words stored in different banks (interleaving) → two words accessed simultaneously per clock cycle.</p>
+    </div>
+
+    <div class="card">
+      <h3>Latency vs Bandwidth</h3>
+      <div class="two-col">
+        <div>
+          <p><span class="accent-yellow">⏱ Latency</span></p>
+          <p>Time to transfer the <strong>first word</strong> of data. In block transfers, this is the startup cost.</p>
+        </div>
+        <div>
+          <p><span class="accent-green">📶 Bandwidth</span></p>
+          <p>Total bits/bytes transferred per second. Depends on: memory speed, bus speed, and number of bits transferred in parallel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 5. ROM FAMILY -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="rom-types">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(176,110,245,0.15)">🔒</div>
+      <div><h2>ROM Family</h2><div class="subtitle">Non-Volatile Memory Types</div></div>
+    </div>
+
+    <div class="highlight purple" style="margin-bottom:20px;">
+      <strong>Why ROM?</strong> SRAM and DRAM are <em>volatile</em> — they lose data when power is off. ROMs are <em>non-volatile</em> — they retain data permanently. Used for BIOS, firmware, boot programs.
+    </div>
+
+    <div class="card">
+      <h3>ROM — Read-Only Memory <span class="tag" style="background:rgba(176,110,245,0.15);color:var(--accent5)">PERMANENT</span></h3>
+      <p>Data is written at <strong>manufacturing time</strong>. Cannot be changed. Reading works the same as RAM.</p>
+      <div class="highlight purple" style="margin-top:10px;">Cell: Transistor connected (or not) to ground at point P → stores 0 or 1. To read: activate word line; voltage drops = 0, stays = 1.</div>
+    </div>
+
+    <div class="card">
+      <h3>PROM — Programmable ROM <span class="tag" style="background:rgba(240,165,0,0.1);color:var(--accent2)">WRITE ONCE</span></h3>
+      <p>User can write data <strong>once</strong> using high-current pulses. A <strong>fuse</strong> at point P is blown to program.</p>
+      <ul style="margin-top:10px;">
+        <li>Initially all 0s; user inserts 1s by blowing fuses</li>
+        <li><strong>Irreversible</strong> — once written, cannot be changed</li>
+        <li>Needs special equipment to program</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>EPROM — Erasable Programmable ROM <span class="tag" style="background:rgba(61,232,160,0.1);color:var(--accent3)">UV ERASABLE</span></h3>
+      <p>Can be <strong>erased and reprogrammed</strong>. Uses a special transistor that can be disabled by trapping charges.</p>
+      <ul style="margin-top:10px;">
+        <li>Erase by exposing chip to <strong>UV (ultraviolet) light</strong> — dissipates trapped charges</li>
+        <li>Useful during <strong>development phase</strong> when frequent changes are needed</li>
+      </ul>
+      <div class="highlight red" style="margin-top:10px;">
+        <strong>Disadvantages:</strong> Chip must be <em>physically removed</em> from circuit for reprogramming. UV erases the <em>entire chip</em>, not individual cells.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>EEPROM — Electrically Erasable PROM <span class="tag" style="background:rgba(91,138,245,0.1);color:var(--accent1)">ELECTRICALLY ERASABLE</span></h3>
+      <p>Can be programmed and erased <strong>electrically</strong> — no removal from circuit, no UV needed.</p>
+      <ul style="margin-top:10px;">
+        <li>Can erase <strong>individual cells</strong> selectively (unlike EPROM)</li>
+      </ul>
+      <div class="highlight red" style="margin-top:10px;">
+        <strong>Disadvantages:</strong> Different voltages needed for erase/write/read. Writing is <em>much slower</em> than reading.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Flash Memory <span class="tag" style="background:rgba(240,165,0,0.1);color:var(--accent2)">BLOCK ERASE</span></h3>
+      <p>Similar to EEPROM but reads single cells, writes/erases <strong>entire blocks</strong>. Key properties:</p>
+      <ul style="margin-top:10px;">
+        <li><strong>High density</strong>, low power, high capacity</li>
+        <li><strong>Block-level erase</strong> — entire block erased at once (not per-cell)</li>
+        <li>Used in USB drives, SSDs, phones, cameras, MP3 players</li>
+        <li>Single chips insufficient → packaged as <strong>Flash Cards</strong> (plug-in) or <strong>Flash Drives</strong> (SSD-like)</li>
+      </ul>
+      <div class="highlight green" style="margin-top:10px;">Flash drives: shorter seek times, lower power, insensitive to vibration compared to hard disks.</div>
+    </div>
+
+    <div class="card">
+      <h3>ROM Family Summary Table</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Type</th><th>Written by</th><th>Erasable?</th><th>How erased</th><th>Granularity</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">ROM</td><td>Manufacturer</td><td>❌ No</td><td>—</td><td>—</td></tr>
+          <tr><td class="label">PROM</td><td>User (once)</td><td>❌ No</td><td>—</td><td>—</td></tr>
+          <tr><td class="label">EPROM</td><td>User</td><td>✅ Yes</td><td>UV light</td><td>Whole chip</td></tr>
+          <tr><td class="label">EEPROM</td><td>User</td><td>✅ Yes</td><td>Electrical</td><td>Individual cell</td></tr>
+          <tr><td class="label">Flash</td><td>User</td><td>✅ Yes</td><td>Electrical</td><td>Block</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 6. MEMORY HIERARCHY -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="hierarchy">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(91,138,245,0.15)">🏗</div>
+      <div><h2>Memory Hierarchy</h2><div class="subtitle">Speed vs Size vs Cost tradeoff</div></div>
+    </div>
+
+    <div class="card">
+      <p style="margin-bottom:16px;">The key idea: <strong>fast memory is expensive and small; slow memory is cheap and large.</strong> The hierarchy exploits this by keeping frequently used data in the fastest (closest) level.</p>
+      <div class="hierarchy">
+        <div class="hier-level regs">
+          <div class="left"><span class="name">CPU Registers</span><span class="type">On-chip</span></div>
+          <div class="right"><span class="speed accent-red">~1 cycle</span><span class="size">Few bytes</span></div>
+        </div>
+        <div class="hier-arrow">↓ slower</div>
+        <div class="hier-level l1">
+          <div class="left"><span class="name">L1 Cache</span><span class="type">On-chip, SRAM</span></div>
+          <div class="right"><span class="speed accent-yellow">~2–4 cycles</span><span class="size">32–256 KB</span></div>
+        </div>
+        <div class="hier-arrow">↓ slower</div>
+        <div class="hier-level l2">
+          <div class="left"><span class="name">L2 Cache</span><span class="type">Near-chip, SRAM</span></div>
+          <div class="right"><span class="speed accent-blue">~10–20 cycles</span><span class="size">256 KB – 8 MB</span></div>
+        </div>
+        <div class="hier-arrow">↓ slower</div>
+        <div class="hier-level main">
+          <div class="left"><span class="name">Main Memory</span><span class="type">DRAM, SIMMs/DIMMs</span></div>
+          <div class="right"><span class="speed accent-green">~50–100 cycles</span><span class="size">GBs</span></div>
+        </div>
+        <div class="hier-arrow">↓ slower</div>
+        <div class="hier-level disk">
+          <div class="left"><span class="name">Magnetic Disk</span><span class="type">Secondary Storage</span></div>
+          <div class="right"><span class="speed accent-purple">Millions of cycles</span><span class="size">TBs</span></div>
+        </div>
+      </div>
+      <div class="highlight blue" style="margin-top:16px;"><strong>Goal:</strong> Bring instructions and data that will be used soon as <em>close to the processor as possible</em>.</div>
+    </div>
+
+    <div class="card">
+      <h3>SIMM & DIMM</h3>
+      <p>Large dynamic memories are packaged as <strong>memory modules</strong> rather than placing chips directly on the motherboard:</p>
+      <ul style="margin-top:10px;">
+        <li><strong>SIMM</strong> — Single In-line Memory Module: chips on one side</li>
+        <li><strong>DIMM</strong> — Dual In-line Memory Module: chips on both sides, more bandwidth</li>
+        <li>Plug vertically into a socket → saves space + easy to expand/replace</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 7. CACHE MEMORY -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="cache">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(240,165,0,0.15)">⚡</div>
+      <div><h2>Cache Memory</h2><div class="subtitle">Locality · Hit/Miss · Write Policies · Coherence</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Why Cache?</h3>
+      <p>The processor is <strong>much faster</strong> than main memory. Without cache, the processor spends most of its time waiting for data. Cache is a small, fast memory placed between CPU and main memory to hide this speed gap.</p>
+      <div class="highlight yellow" style="margin-top:12px;"><strong>Cache hit rate > 90%</strong> is achievable with a good cache design — meaning the processor finds data in cache 9 out of 10 times.</div>
+    </div>
+
+    <div class="card">
+      <h3>Locality of Reference 📍</h3>
+      <p>Cache works because programs exhibit <strong>locality</strong> — they reuse the same data and code repeatedly.</p>
+      <div class="two-col" style="margin-top:16px;">
+        <div class="highlight blue">
+          <strong>Temporal Locality:</strong> A recently accessed location will likely be accessed <em>again soon</em>. (e.g., loop variables, frequently called functions)
+        </div>
+        <div class="highlight green">
+          <strong>Spatial Locality:</strong> Locations <em>near</em> a recently accessed location are likely to be accessed soon. (e.g., array elements, sequential instructions)
+        </div>
+      </div>
+      <div class="highlight purple" style="margin-top:12px;">
+        <strong>Sequential Locality:</strong> Instructions tend to be accessed sequentially (one after another).
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>How Cache Works — Overview</h3>
+      <ol class="steps">
+        <li><span>CPU requests a memory location</span></li>
+        <li><span>Check cache for this data (check tags)</span></li>
+        <li><span><strong>Cache HIT</strong>: Data found → serve directly from cache (fast!)</span></li>
+        <li><span><strong>Cache MISS</strong>: Data not found → fetch entire <strong>block</strong> from main memory into cache</span></li>
+        <li><span>Deliver requested word to CPU</span></li>
+      </ol>
+      <div class="highlight blue" style="margin-top:12px;"><strong>Cache block / Cache line</strong>: A contiguous group of memory words transferred together. Exploits spatial locality.</div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Cache HIT ✅</h3>
+        <p><strong>Read Hit:</strong> Data found in cache → processor gets it directly. Main memory NOT involved.</p>
+        <p style="margin-top:10px;"><strong>Write Hit — two protocols:</strong></p>
+        <div class="highlight green" style="margin-top:8px;"><strong>Write-Through:</strong> Update cache AND main memory simultaneously. Simple, reliable. Good when writes are infrequent.</div>
+        <div class="highlight yellow" style="margin-top:8px;"><strong>Write-Back (Copy-Back):</strong> Update only the cache. Set the <strong>dirty bit</strong>. Write to main memory only when the block is replaced.</div>
+      </div>
+      <div class="card">
+        <h3>Cache MISS ❌</h3>
+        <p><strong>Read Miss:</strong> Fetch block from memory → load into cache → send data to CPU.</p>
+        <div class="highlight blue" style="margin-top:8px;"><strong>Load-Through / Early-Restart:</strong> Forward the requested word to CPU as soon as it arrives, without waiting for the entire block.</div>
+        <p style="margin-top:10px;"><strong>Write Miss:</strong></p>
+        <div class="highlight green" style="margin-top:8px;">Write-Through: Update main memory directly.</div>
+        <div class="highlight yellow" style="margin-top:8px;">Write-Back: Bring block into cache first, then update the word.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Cache Coherence Problem 🔄</h3>
+      <p>When multiple copies of data exist (cache + main memory + disk), they can become inconsistent.</p>
+      <div class="highlight red" style="margin-top:12px;">
+        <strong>Valid Bit:</strong> Each cache block has a valid bit. If 1 → block is valid. If 0 → block is stale/invalid.
+        On power-on, all valid bits = 0.
+      </div>
+      <div class="two-col" style="margin-top:12px;">
+        <div class="highlight yellow">
+          <strong>Case 1 (DMA modifies disk → main memory):</strong> Cache copy becomes stale. <em>Solution:</em> Set valid bit = 0 to mark cache block as stale.
+        </div>
+        <div class="highlight yellow">
+          <strong>Case 2 (Cache modified, DMA reads main memory to disk):</strong> Main memory has old data. Dirty bit is set. <em>Solution:</em> Force write-back before DMA transfer.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 8. MAPPING FUNCTIONS -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="mapping">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(61,232,160,0.15)">🗺</div>
+      <div><h2>Mapping Functions</h2><div class="subtitle">Direct · Associative · Set-Associative</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Setup (Standard Example)</h3>
+      <p>Used in all three mapping types:</p>
+      <ul style="margin-top:10px;">
+        <li>Main memory: <strong>16-bit address</strong> → 2<sup>16</sup> = 64K words</li>
+        <li>Block size: <strong>16 words</strong> = 2<sup>4</sup> → need 4 word bits</li>
+        <li>Main memory: 64K / 16 = <strong>4096 = 4K blocks</strong></li>
+        <li>Cache size: <strong>2048 = 2K words</strong> → 2048 / 16 = <strong>128 cache blocks</strong></li>
+      </ul>
+    </div>
+
+    <!-- DIRECT MAPPING -->
+    <div class="card">
+      <h3>1. Direct Mapping <span class="tag" style="background:rgba(91,138,245,0.1);color:var(--accent1)">SIMPLEST</span></h3>
+      <p>Each main memory block maps to <strong>exactly one</strong> specific cache line.</p>
+      <div class="formula">
+        <span class="label">Cache block = Memory block mod Number of cache blocks</span>
+        <span class="eq">B = j mod C &nbsp;&nbsp;&nbsp; (where C = 128 cache blocks)</span>
+      </div>
+      <div class="formula">
+        <span class="label">Tag = which of the 32 blocks maps to this cache line</span>
+        <span class="eq">Tag = j / C &nbsp;&nbsp;&nbsp; (quotient)</span>
+      </div>
+      <p style="margin-top:12px;"><strong>Address fields (16-bit address):</strong></p>
+      <div class="mapping-visual">
+        <div class="mapping-row">
+          <span class="bit-label">16-bit address:</span>
+        </div>
+        <div class="mapping-row">
+          <div class="bit-group">
+            <div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div>
+          </div>
+          <div class="bit-group">
+            <div class="bit block">B</div><div class="bit block">B</div><div class="bit block">B</div><div class="bit block">B</div><div class="bit block">B</div><div class="bit block">B</div><div class="bit block">B</div>
+          </div>
+          <div class="bit-group">
+            <div class="bit word">W</div><div class="bit word">W</div><div class="bit word">W</div><div class="bit word">W</div>
+          </div>
+        </div>
+        <div class="mapping-row" style="margin-top:8px;gap:0">
+          <span style="width:5*32px;color:var(--accent2);">← 5 tag bits →</span>
+          &nbsp;&nbsp;
+          <span style="color:var(--accent1);">← 7 block bits →</span>
+          &nbsp;&nbsp;
+          <span style="color:var(--accent3);">← 4 word bits →</span>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--muted);">
+          Tag (5 bits): identifies which of 32 blocks is in this slot (4096/128 = 32 = 2⁵)<br>
+          Block (7 bits): which of 128 cache lines (128 = 2⁷)<br>
+          Word (4 bits): which of 16 words in the block (16 = 2⁴)
+        </div>
+      </div>
+      <div class="highlight red" style="margin-top:12px;"><strong>Thrashing:</strong> If a program repeatedly accesses 2 blocks that map to the same cache line, it causes frequent misses even if cache isn't full.</div>
+      <div class="highlight green" style="margin-top:8px;"><strong>Pros:</strong> Simple, fast, cheap to implement. <strong>Cons:</strong> Not flexible, thrashing possible.</div>
+    </div>
+
+    <!-- ASSOCIATIVE MAPPING -->
+    <div class="card">
+      <h3>2. Associative (Fully Associative) Mapping <span class="tag" style="background:rgba(61,232,160,0.1);color:var(--accent3)">FLEXIBLE</span></h3>
+      <p>A main memory block can be placed in <strong>any cache line</strong>. No fixed mapping.</p>
+      <div class="mapping-visual" style="margin-top:12px;">
+        <div class="mapping-row">
+          <div class="bit-group">
+            <div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div>
+            <div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div>
+            <div class="bit tag">T</div><div class="bit tag">T</div>
+          </div>
+          <div class="bit-group">
+            <div class="bit word">W</div><div class="bit word">W</div><div class="bit word">W</div><div class="bit word">W</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted);">
+          Tag (12 bits): uniquely identifies which of 4096 memory blocks is in cache (4096 = 2¹²)<br>
+          Word (4 bits): which word within the block
+        </div>
+      </div>
+      <div class="highlight green" style="margin-top:12px;"><strong>Pros:</strong> Very flexible, maximizes cache utilization, no thrashing. Replacement algorithms (LRU etc.) can be used.</div>
+      <div class="highlight red" style="margin-top:8px;"><strong>Cons:</strong> All 128 tags must be searched in parallel → expensive circuitry → high cost.</div>
+    </div>
+
+    <!-- SET-ASSOCIATIVE MAPPING -->
+    <div class="card">
+      <h3>3. Set-Associative Mapping <span class="tag" style="background:rgba(176,110,245,0.1);color:var(--accent5)">BEST OF BOTH</span></h3>
+      <p>A compromise: cache is divided into <strong>sets</strong>, each set has <strong>k lines</strong> (k-way set associative). A block maps to a specific set (like direct mapping) but can go in <em>any line within that set</em> (like associative).</p>
+      <div class="formula">
+        <span class="label">Set Number</span>
+        <span class="eq">s = j mod (C/k) &nbsp;&nbsp; where C = cache blocks, k = blocks per set</span>
+      </div>
+      <div class="formula">
+        <span class="label">Tag Number</span>
+        <span class="eq">t = j / (C/k) &nbsp;&nbsp; (quotient)</span>
+      </div>
+      <p style="margin-top:12px;"><strong>Example: 2-way set associative, 64 sets</strong> (128 blocks / 2 = 64 sets):</p>
+      <div class="mapping-visual">
+        <div class="mapping-row">
+          <div class="bit-group">
+            <div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div><div class="bit tag">T</div>
+          </div>
+          <div class="bit-group">
+            <div class="bit set">S</div><div class="bit set">S</div><div class="bit set">S</div><div class="bit set">S</div><div class="bit set">S</div><div class="bit set">S</div>
+          </div>
+          <div class="bit-group">
+            <div class="bit word">W</div><div class="bit word">W</div><div class="bit word">W</div><div class="bit word">W</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted);">
+          Tag (6 bits): 4096/64 = 64 = 2⁶ → 6 tag bits to identify the block within the set<br>
+          Set (6 bits): 64 sets = 2⁶ → 6 set bits<br>
+          Word (4 bits): 16 words per block = 2⁴
+        </div>
+      </div>
+      <div class="highlight purple" style="margin-top:12px;">
+        <strong>Special cases:</strong><br>
+        k=1 → one block per set → <em>same as Direct Mapping</em><br>
+        k=C → all blocks in one set → <em>same as Fully Associative</em>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Where Can Block 12 Go? (Cache of 8 blocks)</h3>
+      <table class="compare-table">
+        <thead><tr><th>Mapping</th><th>Block 12 can go to</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Direct</td><td>Only block 4</td><td>12 mod 8 = 4</td></tr>
+          <tr><td class="label">Fully Associative</td><td>Any of the 8 blocks</td><td>No restriction</td></tr>
+          <tr><td class="label">Set-Associative (4 sets)</td><td>Any slot in set 0</td><td>12 mod 4 = 0 → set 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 9. REPLACEMENT ALGORITHMS -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="replacement">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(240,92,110,0.15)">🔀</div>
+      <div><h2>Replacement Algorithms</h2><div class="subtitle">Which cache block to evict when cache is full?</div></div>
+    </div>
+
+    <div class="highlight blue" style="margin-bottom:20px;"><strong>When:</strong> Cache is full and a new block needs to be loaded. Only applies to Associative and Set-Associative caches (Direct mapping has only one choice).</div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>LRU — Least Recently Used <span class="tag" style="background:rgba(61,232,160,0.1);color:var(--accent3)">BEST PERFORMANCE</span></h3>
+        <p>Replace the block that was <strong>accessed least recently</strong>. Based on temporal locality — recently used data is likely needed again.</p>
+        <div class="highlight green" style="margin-top:10px;">Implemented using a <strong>USE bit</strong> (for 2-way): set USE=1 when accessed, clear others. For more ways: need <strong>timestamps</strong> → expensive.</div>
+      </div>
+      <div class="card">
+        <h3>FIFO — First In, First Out</h3>
+        <p>Replace the block that has been in the cache the <strong>longest</strong>, regardless of usage frequency.</p>
+        <div class="highlight yellow" style="margin-top:10px;">Easy to implement as a <strong>circular buffer</strong>. May evict frequently used blocks just because they arrived first.</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>LFU — Least Frequently Used</h3>
+        <p>Replace the block with the <strong>fewest accesses</strong>. Needs a <strong>hit counter</strong> per block.</p>
+      </div>
+      <div class="card">
+        <h3>Random Replacement</h3>
+        <p>Replace a <strong>randomly chosen</strong> block. Surprisingly good in practice, simple to implement.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>FIFO vs LRU — Worked Example (4 cache slots)</h3>
+      <p style="margin-bottom:12px;">Reference string: A B C A D E A D C F</p>
+      <div class="two-col">
+        <div>
+          <p style="margin-bottom:8px;" class="accent-yellow"><strong>FIFO — Hit Ratio: 3/10 = 0.3</strong></p>
+          <table class="compare-table" style="font-size:12px;">
+            <thead><tr><th>Ref</th><th>Result</th><th>Cache State</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td class="accent-red">Miss</td><td>A</td></tr>
+              <tr><td>B</td><td class="accent-red">Miss</td><td>A B</td></tr>
+              <tr><td>C</td><td class="accent-red">Miss</td><td>A B C</td></tr>
+              <tr><td>A</td><td class="accent-green">Hit</td><td>A B C</td></tr>
+              <tr><td>D</td><td class="accent-red">Miss</td><td>A B C D</td></tr>
+              <tr><td>E</td><td class="accent-red">Miss</td><td>E B C D (A evicted)</td></tr>
+              <tr><td>A</td><td class="accent-red">Miss</td><td>E A C D (B evicted)</td></tr>
+              <tr><td>D</td><td class="accent-green">Hit</td><td>E A C D</td></tr>
+              <tr><td>C</td><td class="accent-green">Hit</td><td>E A C D</td></tr>
+              <tr><td>F</td><td class="accent-red">Miss</td><td>E A F D (C evicted)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p style="margin-bottom:8px;" class="accent-green"><strong>LRU — Hit Ratio: 4/10 = 0.4</strong></p>
+          <table class="compare-table" style="font-size:12px;">
+            <thead><tr><th>Ref</th><th>Result</th><th>Cache State</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td class="accent-red">Miss</td><td>A</td></tr>
+              <tr><td>B</td><td class="accent-red">Miss</td><td>A B</td></tr>
+              <tr><td>C</td><td class="accent-red">Miss</td><td>A B C</td></tr>
+              <tr><td>A</td><td class="accent-green">Hit</td><td>B C A (A refreshed)</td></tr>
+              <tr><td>D</td><td class="accent-red">Miss</td><td>C A D (B evicted — LRU)</td></tr>
+              <tr><td>E</td><td class="accent-red">Miss</td><td>A D E (C evicted — LRU)</td></tr>
+              <tr><td>A</td><td class="accent-green">Hit</td><td>D E A (A refreshed)</td></tr>
+              <tr><td>D</td><td class="accent-green">Hit</td><td>E A D (D refreshed)</td></tr>
+              <tr><td>C</td><td class="accent-green">Hit</td><td>A D C (E evicted)</td></tr>
+              <tr><td>F</td><td class="accent-red">Miss</td><td>D C F (A evicted)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="highlight green" style="margin-top:12px;"><strong>LRU outperforms FIFO</strong> (4 hits vs 3 hits) because it considers recency of access, not just insertion order.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 10. PERFORMANCE & INTERLEAVING -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="performance">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(176,110,245,0.15)">📊</div>
+      <div><h2>Performance & Interleaving</h2><div class="subtitle">Hit Rate · Miss Penalty · Memory Interleaving</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Key Performance Definitions</h3>
+      <table class="compare-table">
+        <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Hit</td><td>Data found at the given memory level</td></tr>
+          <tr><td class="label">Miss</td><td>Data NOT found → must go to the next level</td></tr>
+          <tr><td class="label">Hit Rate (h)</td><td>% of accesses that result in a hit</td></tr>
+          <tr><td class="label">Miss Rate</td><td>1 − Hit Rate</td></tr>
+          <tr><td class="label">Hit Time</td><td>Time to access data at a given level (on a hit)</td></tr>
+          <tr><td class="label">Miss Penalty</td><td>Extra time to fetch data from next level on a miss</td></tr>
+        </tbody>
+      </table>
+      <div class="formula" style="margin-top:16px;">
+        <span class="label">Average Access Time (2-level cache)</span>
+        <span class="eq">T<sub>avg</sub> = h₁·c₁ + (1−h₁)·h₂·c₂ + (1−h₁)·(1−h₂)·M</span>
+      </div>
+      <p style="margin-top:10px;font-size:14px;color:var(--muted);">Where h₁ = L1 hit rate, c₁ = L1 access time, h₂ = L2 hit rate, c₂ = L2 access time, M = main memory time.</p>
+    </div>
+
+    <div class="card">
+      <h3>Improving Performance</h3>
+      <div class="two-col">
+        <div class="highlight green">
+          <strong>Improve Hit Rate:</strong> Increase block size (exploits spatial locality). But too large → fewer cache lines, more conflicts.
+        </div>
+        <div class="highlight blue">
+          <strong>Reduce Miss Penalty:</strong> Use <strong>load-through / early-restart</strong> — send the requested word to CPU as soon as it arrives, don't wait for full block.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Memory Interleaving 🔀</h3>
+      <p>Divide memory into multiple independent <strong>memory modules</strong>, each with its own ABR (Address Buffer Register) and DBR (Data Buffer Register). Arrange addressing so consecutive addresses go to different modules.</p>
+      <div class="highlight green" style="margin-top:12px;"><strong>Key benefit:</strong> Consecutive memory accesses go to different modules → can be served in parallel → increases effective memory bandwidth.</div>
+      <div class="two-col" style="margin-top:12px;">
+        <div class="highlight blue">
+          <strong>Low-order interleaving:</strong> Low-order address bits select the module. Consecutive words → consecutive modules → parallel access possible. Best for block transfers.
+        </div>
+        <div class="highlight yellow">
+          <strong>High-order interleaving:</strong> High-order bits select the module. Consecutive words → same module. Only one module active during block transfer.
+        </div>
+      </div>
+      <div class="formula" style="margin-top:12px;">
+        <span class="label">Miss Penalty Example (1-word bus)</span>
+        <span class="eq">Miss penalty = 1 (addr) + 4×15 (DRAM) + 4×1 (transfer) = 65 cycles</span>
+      </div>
+      <div class="formula">
+        <span class="label">With 4-bank interleaving</span>
+        <span class="eq">Miss penalty = 1 + 1×15 + 4×1 = 20 cycles (much better!)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 11. MEMORY CONTROLLER -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="controller">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(91,138,245,0.15)">🎛</div>
+      <div><h2>Memory Controller</h2><div class="subtitle">The bridge between processor and DRAM</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Why a Memory Controller?</h3>
+      <p>DRAM uses <strong>multiplexed addresses</strong> (row address first, then column address, through the same pins). But the processor sends all address bits at the same time. The memory controller bridges this gap.</p>
+    </div>
+
+    <div class="card">
+      <h3>Memory Controller Functions</h3>
+      <ul>
+        <li>Sits between processor and DRAM memory</li>
+        <li>Accepts <strong>complete address + R/W</strong> from processor</li>
+        <li>Splits address → sends <strong>row address</strong> first with <strong>RAS</strong> signal</li>
+        <li>Then sends <strong>column address</strong> with <strong>CAS</strong> signal</li>
+        <li>Sends R/W and CS signals to memory</li>
+        <li>Data lines are connected directly (no buffering)</li>
+        <li>Contains a <strong>refresh counter</strong> to periodically refresh all DRAM rows within the specified time limit</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Refresh Overhead Calculation</h3>
+      <div class="highlight blue">
+        <strong>Example:</strong> SDRAM with 8192 rows, 4 clock cycles per row, 133 MHz clock, 64 ms refresh period.
+      </div>
+      <div class="formula" style="margin-top:12px;">
+        <span class="label">Total refresh cycles</span>
+        <span class="eq">8192 × 4 = 32,768 cycles</span>
+      </div>
+      <div class="formula">
+        <span class="label">Time for refresh</span>
+        <span class="eq">32,768 / 133×10⁶ = 246×10⁻⁶ sec = 0.246 ms</span>
+      </div>
+      <div class="formula">
+        <span class="label">Refresh overhead</span>
+        <span class="eq">0.246 / 64 = 0.0038 = 0.38% of total time</span>
+      </div>
+      <div class="highlight green" style="margin-top:10px;">Only <strong>0.38%</strong> overhead — negligible! DRAM refresh has very little impact on performance.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 12. FLASHCARDS / KEY TERMS -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="flashcards">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(240,165,0,0.15)">⚡</div>
+      <div><h2>Key Terms — Quick Recall</h2><div class="subtitle">Hover to highlight · Read before the exam</div></div>
+    </div>
+    <div class="memory-grid">
+      <div class="memory-card blue"><span class="emoji">🗃</span><div class="term">MAR</div><div class="def">Memory Address Register — holds the address of the memory location to access. If k-bits wide → 2k addressable locations.</div></div>
+      <div class="memory-card yellow"><span class="emoji">📦</span><div class="term">MDR</div><div class="def">Memory Data Register — holds data being transferred. n-bits wide = word length = bits transferred per cycle.</div></div>
+      <div class="memory-card green"><span class="emoji">✅</span><div class="term">MFC</div><div class="def">Memory Function Completed — signal from memory telling the processor that the requested operation is done.</div></div>
+      <div class="memory-card red"><span class="emoji">⏱</span><div class="term">Access Time</div><div class="def">Time from initiation to completion of a memory operation (e.g., READ to MFC).</div></div>
+      <div class="memory-card purple"><span class="emoji">🔁</span><div class="term">Cycle Time</div><div class="def">Minimum delay between two successive memory operations. Always ≥ access time.</div></div>
+      <div class="memory-card blue"><span class="emoji">🏎</span><div class="term">SRAM</div><div class="def">Static RAM — uses flip-flops. Fast, expensive, no refresh needed. Used in CACHE memory.</div></div>
+      <div class="memory-card yellow"><span class="emoji">🔋</span><div class="term">DRAM</div><div class="def">Dynamic RAM — stores charge in capacitors. Slower, cheaper, needs periodic refresh. Used in MAIN MEMORY.</div></div>
+      <div class="memory-card green"><span class="emoji">📡</span><div class="term">RAS</div><div class="def">Row Address Strobe — signal that latches the row address in DRAM (high-order bits sent first).</div></div>
+      <div class="memory-card red"><span class="emoji">📶</span><div class="term">CAS</div><div class="def">Column Address Strobe — signal that latches the column address in DRAM (low-order bits sent second).</div></div>
+      <div class="memory-card purple"><span class="emoji">📖</span><div class="term">ROM</div><div class="def">Read-Only Memory — non-volatile, written at manufacture, cannot be changed. Used for BIOS, firmware.</div></div>
+      <div class="memory-card blue"><span class="emoji">🔏</span><div class="term">PROM</div><div class="def">Programmable ROM — user programs it ONCE using high-current pulses (blows fuses). Irreversible.</div></div>
+      <div class="memory-card yellow"><span class="emoji">☀️</span><div class="term">EPROM</div><div class="def">Erasable PROM — erased by UV light (whole chip at once). Must be removed from circuit for reprogramming.</div></div>
+      <div class="memory-card green"><span class="emoji">⚡</span><div class="term">EEPROM</div><div class="def">Electrically Erasable PROM — erased electrically, per cell, without removal. Slower writes than reads.</div></div>
+      <div class="memory-card red"><span class="emoji">💾</span><div class="term">Flash</div><div class="def">Like EEPROM but writes/erases whole blocks. High density, low power. Used in USB drives, SSDs, phones.</div></div>
+      <div class="memory-card purple"><span class="emoji">🎯</span><div class="term">Locality of Reference</div><div class="def">Programs access same memory locations repeatedly (temporal) or nearby locations (spatial). Foundation of cache design.</div></div>
+      <div class="memory-card blue"><span class="emoji">✅</span><div class="term">Cache Hit</div><div class="def">Requested data IS in cache. Fast access — main memory NOT accessed.</div></div>
+      <div class="memory-card yellow"><span class="emoji">❌</span><div class="term">Cache Miss</div><div class="def">Requested data NOT in cache. Must fetch block from main memory — slower.</div></div>
+      <div class="memory-card green"><span class="emoji">📝</span><div class="term">Write-Through</div><div class="def">Update cache AND main memory simultaneously on every write. Simple, no dirty bit needed.</div></div>
+      <div class="memory-card red"><span class="emoji">🏷</span><div class="term">Write-Back</div><div class="def">Update only cache. Set dirty bit. Write to memory only when block is replaced. Faster writes.</div></div>
+      <div class="memory-card purple"><span class="emoji">🚩</span><div class="term">Valid Bit</div><div class="def">1 = cache block contains valid data. 0 = stale/empty. Set to 0 on power-on or when coherence violated.</div></div>
+      <div class="memory-card blue"><span class="emoji">🏷</span><div class="term">Dirty Bit</div><div class="def">Indicates cache block has been modified but not yet written to main memory. Used with write-back protocol.</div></div>
+      <div class="memory-card yellow"><span class="emoji">🗺</span><div class="term">Direct Mapping</div><div class="def">Each memory block → exactly 1 cache line (b = j mod C). Simple but can cause thrashing. Formula: B = j mod C.</div></div>
+      <div class="memory-card green"><span class="emoji">🔀</span><div class="term">Associative Mapping</div><div class="def">Any memory block → any cache line. Flexible, uses cache efficiently. All tags searched in parallel → expensive.</div></div>
+      <div class="memory-card red"><span class="emoji">⚖️</span><div class="term">Set-Associative</div><div class="def">Compromise: cache split into sets, block maps to a set (direct), can go in any line within the set (associative).</div></div>
+      <div class="memory-card purple"><span class="emoji">🕐</span><div class="term">LRU</div><div class="def">Least Recently Used — replace the block unused for the longest time. Best performance, uses USE bits or timestamps.</div></div>
+      <div class="memory-card blue"><span class="emoji">📋</span><div class="term">FIFO</div><div class="def">First In First Out — replace the oldest block in cache. Easy circular buffer, but may evict frequently used blocks.</div></div>
+      <div class="memory-card yellow"><span class="emoji">🔀</span><div class="term">Memory Interleaving</div><div class="def">Consecutive addresses spread across multiple memory modules → parallel access → higher effective bandwidth.</div></div>
+      <div class="memory-card green"><span class="emoji">⏳</span><div class="term">Latency</div><div class="def">Time to transfer the FIRST word of a block. The startup cost of any memory access.</div></div>
+      <div class="memory-card red"><span class="emoji">📶</span><div class="term">Bandwidth</div><div class="def">Bits/bytes transferred per second. Depends on memory speed, bus width, and access parallelism.</div></div>
+      <div class="memory-card purple"><span class="emoji">🔄</span><div class="term">Cache Coherence</div><div class="def">Problem when cache and memory have different versions of the same data. Solved with valid bit or forced write-back.</div></div>
+      <div class="memory-card blue"><span class="emoji">⚡</span><div class="term">DDR SDRAM</div><div class="def">Double Data Rate — transfers data on BOTH edges of clock → doubles bandwidth compared to regular SDRAM.</div></div>
+      <div class="memory-card yellow"><span class="emoji">📄</span><div class="term">Fast Page Mode</div><div class="def">Access consecutive bytes in same DRAM row without re-selecting the row → much faster sequential access.</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- 13. QUICK QUIZ -->
+  <!-- ═══════════════════════════════════ -->
+  <section class="section" id="quiz">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(61,232,160,0.15)">🧠</div>
+      <div><h2>Quick Quiz</h2><div class="subtitle">Test yourself — click "Show Answer" for each question</div></div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q1. A 20-bit address bus can access how many memory locations?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation">2<sup>20</sup> = <strong>1M (1,048,576) locations</strong>. Rule: k address bits → 2<sup>k</sup> locations.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q2. What is the difference between Memory Access Time and Memory Cycle Time?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation"><strong>Access Time:</strong> Time from initiation to completion of one operation (READ → MFC).<br><strong>Cycle Time:</strong> Minimum delay between starting two successive operations. Cycle time is always slightly <em>longer</em> than access time.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q3. Why does DRAM need to be refreshed, but SRAM does not?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation">DRAM stores bits as <strong>charge on a capacitor</strong>, which leaks over time. If not refreshed (~every 64ms), data is lost.<br>SRAM uses <strong>flip-flops (cross-coupled inverters)</strong> which actively maintain state — no charge leaks, no refresh needed.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q4. In direct mapping, memory block 200 maps to which cache line? (128 cache lines total)</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation"><strong>B = 200 mod 128 = 72</strong><br>Block 200 maps to cache line <strong>72</strong>.<br>Tag = 200 / 128 = 1 (this is the 2nd group of 128 blocks).</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q5. What is "thrashing" in the context of cache memory?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation">Thrashing occurs in <strong>direct-mapped caches</strong> when two memory blocks that both map to the same cache line are accessed alternately. Each access evicts the other, causing constant cache misses even though the cache has free space for other blocks.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q6. Which ROM type requires physical removal from the circuit for reprogramming?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation"><strong>EPROM</strong> (Erasable Programmable ROM). It is erased by exposing the chip to <strong>UV (ultraviolet) light</strong>, which requires removing it from the circuit. EEPROM and Flash can be erased electrically without removal.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q7. Write-back vs Write-through — which is better for performance and why?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation"><strong>Write-back</strong> is generally faster because writes only go to cache, not main memory on every write. Main memory is updated only when the block is evicted (indicated by the dirty bit). This reduces memory bus traffic.<br><br><strong>Write-through</strong> is simpler and always keeps memory consistent, but generates more memory traffic.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q8. In set-associative mapping with 4-way sets and 32 sets total, where does memory block 50 go?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation"><strong>Set number = 50 mod 32 = 18</strong><br>Block 50 maps to <strong>set 18</strong>. Within set 18, it can go into any of the <strong>4 lines</strong> (4-way). The replacement algorithm decides which line if all 4 are full.</div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q9. What is the "valid bit" and when is it set to 0?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation">The <strong>valid bit</strong> is a flag for each cache block. It is set to 1 when a block is loaded from main memory (meaning the block contains valid data).<br><br>It is set to <strong>0</strong>:<ul style="margin-top:8px;"><li>When power is first turned on</li><li>When a DMA transfer modifies main memory, making the cached copy stale (cache coherence problem)</li></ul></div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="question">Q10. Why does DDR SDRAM have double the bandwidth of standard SDRAM?</div>
+      <button class="show-answer-btn" onclick="toggleAnswer(this)">Show Answer</button>
+      <div class="quiz-explanation">DDR SDRAM transfers data on <strong>both the rising and falling edges</strong> of the clock signal, instead of only the rising edge. This doubles the number of transfers per second with the same clock frequency → double the bandwidth. Latency remains the same.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+  <p style="text-align:center;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:12px;padding-bottom:48px;">COA Module 3 — Memory System Study Guide · Good luck on your exam! 🎯</p>
+
+</main>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  // Nav active state
+  function setActive(el) {
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Quiz answer toggle
+  function toggleAnswer(btn) {
+    const explanation = btn.nextElementSibling;
+    if (explanation.style.display === 'block') {
+      explanation.style.display = 'none';
+      btn.textContent = 'Show Answer';
+    } else {
+      explanation.style.display = 'block';
+      btn.textContent = 'Hide Answer';
+    }
+  }
+
+  // Highlight active nav based on scroll
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('.nav-link');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
